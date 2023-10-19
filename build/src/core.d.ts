@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { MessageEvent } from "ws";
 export declare class WebSocketManager {
     private url;
@@ -7,6 +8,7 @@ export declare class WebSocketManager {
     constructor(url: string);
     private reconnect;
     private run;
+    send(anyMessage: BufferLike): void;
     private traseLog;
 }
 export declare interface WebSocketManager {
@@ -22,3 +24,16 @@ export interface ClientEvents {
     message: [message: MessageEvent];
 }
 export type Cause = "Error" | "Disconnect" | "Connect";
+export type BufferLike = string | Buffer | DataView | number | ArrayBufferView | Uint8Array | ArrayBuffer | SharedArrayBuffer | ReadonlyArray<any> | ReadonlyArray<number> | {
+    valueOf(): ArrayBuffer;
+} | {
+    valueOf(): SharedArrayBuffer;
+} | {
+    valueOf(): Uint8Array;
+} | {
+    valueOf(): ReadonlyArray<number>;
+} | {
+    valueOf(): string;
+} | {
+    [Symbol.toPrimitive](hint: string): string;
+};

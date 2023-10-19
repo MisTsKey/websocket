@@ -55,6 +55,10 @@ export class WebSocketManager {
 		};
 	}
 
+	send( anyMessage : BufferLike ) : void {
+		this.websocket.send(anyMessage);
+	}
+
 	private traseLog ( title : string , description : string ) {
 		throw new WebSocketManagerError(`${title} \n\n ${description} \n`);
 	}
@@ -89,3 +93,22 @@ export interface ClientEvents {
 }
 
 export type Cause = "Error" | "Disconnect" | "Connect"
+
+export type BufferLike =
+    | string
+    | Buffer
+    | DataView
+    | number
+    | ArrayBufferView
+    | Uint8Array
+    | ArrayBuffer
+    | SharedArrayBuffer
+	//eslint-disable-next-line
+    | ReadonlyArray<any>
+    | ReadonlyArray<number>
+    | { valueOf(): ArrayBuffer }
+    | { valueOf(): SharedArrayBuffer }
+    | { valueOf(): Uint8Array }
+    | { valueOf(): ReadonlyArray<number> }
+    | { valueOf(): string }
+    | { [Symbol.toPrimitive](hint: string): string };

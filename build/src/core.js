@@ -42,6 +42,9 @@ class WebSocketManager {
             this.emit("message", message);
         };
     }
+    send(anyMessage) {
+        this.websocket.send(anyMessage);
+    }
     traseLog(title, description) {
         throw new error_1.WebSocketManagerError(`${title} \n\n ${description} \n`);
     }
