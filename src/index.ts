@@ -1,0 +1,3 @@
+export {
+	WebSocketManager
+} from "./core";

@@ -1,0 +1,21 @@
+{
+  "name": "mistskey-websocket-manager",
+  "version": "0.0.1",
+  "description": "the websocket manager for mistskey",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "WebSocketManager"
+  ],
+  "author": "akikaki",
+  "license": "MIT",
+  "dependencies": {
+    "@types/ws": "^8.5.8",
+    "ws": "^8.14.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}
