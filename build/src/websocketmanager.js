@@ -5,17 +5,27 @@ const ws_1 = require("ws");
 const error_1 = require("./components/error");
 //eslint-disable-next-line
 class WebSocketManager extends ws_1.EventEmitter {
-    constructor(url) {
+    constructor(url, websocketOptions) {
         super();
         this.url = url;
-        this.resumeSecond = 10;
+        this.resumeSecond = 5;
         this.websocket = void 0;
         this.isReconnect = false;
+        this.maxResume = null;
+        this.resumeCound = 0;
+        if (websocketOptions) {
+            typeof websocketOptions.resumeSecond !== "undefined" ? this.resumeSecond = websocketOptions.resumeSecond : void 0;
+            typeof websocketOptions.setMaxResume !== "undefined" ? this.maxResume = websocketOptions.setMaxResume : void 0;
+        }
         this.run();
     }
     reconnect() {
         this.emit("debug", `[WSManagePackage] Disconnect from Incetance. Retry in ${this.resumeSecond * 1000}ms.`);
         setTimeout(() => {
+            if (this.maxResume !== null && this.resumeCound > this.maxResume)
+                this.traseLog("WebSocket MaxResumeError", "Retry limit reached.");
+            if (this.maxResume !== null)
+                this.resumeCound++;
             this.emit("debug", "[WSManagePackage] Retrying....");
             this.resumeSecond = this.resumeSecond * 2;
             this.websocket = void 0;

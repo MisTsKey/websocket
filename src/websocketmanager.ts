@@ -1,31 +1,97 @@
 
-import { MessageEvent, WebSocket } from "ws";
+import { EventEmitter, MessageEvent, WebSocket } from "ws";
 import { WebSocketManagerError } from "./components/error";
 
+export interface IWebSocketManagerOptions {
+	/**
+	 * ## setMaxResult
+	 * 
+	 * ---
+	 * 
+	 * Set the resume counts.
+	 * 
+	 * By the default : `None`
+	 * 
+	 * If the server is down, reconnecting will be **useless**.
+	 * 
+	 * Also, since reconnection becomes a considerable load,
+	 * 
+	 * WebSocketManager will stop the WebSocket if this number of times is exceeded.
+	 * 
+	 * ---
+	 * 
+	 * 再試行回数を設定します。
+	 * 
+	 * デフォルト : `なし`
+	 * 
+	 * もしインスタンスがダウンしている場合、再接続は**無駄な処理**となってしまいます。
+	 * 
+	 * なので、負荷防止＆プロセスの軽量化のためにWebSocketManagerはWebSocketをこの回数を越えた場合に
+	 * 
+	 * 再接続動作を停止します。
+	 */
+	setMaxResume : number;
+
+	/**
+	 * ## resumeScond
+	 * 
+	 * ---
+	 * 
+	 * Set the resume secound.
+	 * 
+	 * By the default : `10`(s)
+	 * 
+	 * Resume Second will take longer and longer depending on the number of times you retry.
+	 * 
+	 * ---
+	 * 
+	 * 再試行する間隔の秒数を定義します。
+	 * 
+	 * デフォルト : `10`(秒)
+	 * 
+	 * 再試行する間隔は、再試行する回数に応じてどんどん伸びていきます。
+	 */
+	resumeSecond : number;
+}
+
 //eslint-disable-next-line
-export class WebSocketManager {
+export class WebSocketManager extends EventEmitter {
 
 	private url : string;
 	private websocket : WebSocket;
 	private resumeSecond : number;
 	private isReconnect : boolean;
+	private maxResume : number | null;
+	private resumeCound : number;
 
-	constructor(url : string) {
+	constructor(url : string , websocketOptions ?: IWebSocketManagerOptions ) {
+		super();
 
 		this.url = url;
-		this.resumeSecond = 10;
+		this.resumeSecond = 5;
 		this.websocket = void 0;
 		this.isReconnect = false;
+		this.maxResume = null;
+		this.resumeCound = 0;
+
+		if(websocketOptions) {
+			typeof websocketOptions.resumeSecond !== "undefined" ? this.resumeSecond = websocketOptions.resumeSecond : void 0;
+			typeof websocketOptions.setMaxResume !== "undefined" ? this.maxResume = websocketOptions.setMaxResume : void 0;
+		}
 
 		this.run();
 	}
 
 	private reconnect () {
-		this.emit("debug", `Disconnect from Incetance. Retry in ${this.resumeSecond * 1000}Sec.`);
+		this.emit("debug", `[WSManagePackage] Disconnect from Incetance. Retry in ${this.resumeSecond * 1000}ms.`);
 
 		setTimeout(() => {
+			if(this.maxResume !== null && this.resumeCound > this.maxResume) this.traseLog("WebSocket MaxResumeError", "Retry limit reached.");
+			if(this.maxResume !== null) this.resumeCound++;
+			this.emit("debug", "[WSManagePackage] Retrying....");
 			this.resumeSecond = this.resumeSecond * 2;
-			this.websocket = new WebSocket(this.url);
+			this.websocket = void 0;
+			this.run();
 		}, this.resumeSecond * 1000);
 	}
 

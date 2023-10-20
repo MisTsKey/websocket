@@ -1,3 +1,3 @@
 export {
 	WebSocketManager
-} from "./core";
+} from "./websocketmanager";
