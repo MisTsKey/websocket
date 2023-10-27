@@ -20,12 +20,13 @@ class WebSocketManager extends ws_1.EventEmitter {
         this.run();
     }
     reconnect() {
-        this.emit("debug", `[WSManagePackage] Disconnect from Incetance. Retry in ${this.resumeSecond * 1000}ms.`);
+        this.emit("debug", `[WSManagePackage] Disconnect from Incetance. Retry in ${this.resumeSecond * 1000}ms. \n ${this.maxResume}`);
         setTimeout(() => {
-            if (this.maxResume !== null && this.resumeCound > this.maxResume)
-                this.traseLog("WebSocket MaxResumeError", "Retry limit reached.");
+            // Retry limit
             if (this.maxResume !== null)
                 this.resumeCound++;
+            if (this.maxResume !== null && this.resumeCound === this.maxResume)
+                this.traseLog("WebSocket MaxResumeError", "Retry limit reached.");
             this.emit("debug", "[WSManagePackage] Retrying....");
             this.resumeSecond = this.resumeSecond * 2;
             this.websocket = void 0;
@@ -33,7 +34,9 @@ class WebSocketManager extends ws_1.EventEmitter {
         }, this.resumeSecond * 1000);
     }
     run() {
+        var _a;
         this.websocket = new ws_1.WebSocket(this.url);
+        this.emit("debug", `[WSManagePackage] \n InitURL : ${this.url} \n IsReconnect : ${this.isReconnect} (by the default : false) \n maxResume : ${(_a = this.maxResume) !== null && _a !== void 0 ? _a : "None"} \n Resumed : ${this.resumeCound} (by the default  : 0)`);
         this.websocket.onopen = () => {
             if (!this.isReconnect) {
                 this.emit("ready", () => { });
