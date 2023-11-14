@@ -1,6 +1,6 @@
 {
   "name": "mistskey-websocket-manager",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "the websocket manager for mistskey",
   "main": "build/index.js",
   "scripts": {
